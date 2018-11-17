@@ -1,0 +1,13 @@
+{
+  "name": "dyno_familiar_rpc",
+  "version": "1.0.0",
+  "description": "A rich presence app for Dyno familiars",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "author": "Null",
+  "dependencies": {
+    "discord-rpc": "^3.0.1"
+  }
+}

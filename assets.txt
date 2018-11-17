@@ -1,0 +1,5 @@
+Assets (for smallImageKey and largeImageKey)
+
+dyno - The dyno v4 avatar
+
+dynoglitch - The dyno servers icon as of 11/17/2018
