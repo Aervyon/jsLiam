@@ -16,9 +16,19 @@ A simple rich presence i made for the people of the dyno server. Repurpose it if
 
 - You can config it by using a file named `config.json` in the root of the application.
 
+## Things to not do
+
+- Do not use pm2. It makes it so you cannot reload, load, or unload (depending on if the config file exists) the config once the app is started
+
+## Features
+
+- A hot reloadable configuration file. If you want to reload the configuration file, just type `refresh` into your terminal
+
+- Easy configuration. The configuration keys are below, and are easy to understand (most of the time).
+
 ## Configuration keys
 
-`clientId` - (optional) The clientId of the app you want to use (Cannot be changed once app is running)
+`clientId` - (optional) The clientId of the discord developers application you want to use (Cannot be changed once app is running)
 
 `timestamp` - (optional) Whether or not you want a beginning timestamp. Allowed values: `true`, or `'true'` - Makes sure the timestamp is on. Default: `true`
 
@@ -28,7 +38,11 @@ A simple rich presence i made for the people of the dyno server. Repurpose it if
 
 `largeImageKey` - (optional) The large image of the presence. Example: `"largeImageKey": "trees"`. Default: `"dyno"`
 
+`largeImageText` - (optional) The large images text. Example: `"largeImageText": "Oh hey, some trees!"`. Default: `null`/Does not exist
+
 `smallImageKey` - (optional) The small image of the presence. Will not work if no large image! Example: `"smallImageKey": "ice"`. Default: `"dynoglitch"`
+
+`smallImageText` - (optional) The small images text. Example: `"smallImageText": "Your as cold as ice."`. Default: `null`/Does not exist
 
 ### There is a example configuration file called `example.config.json`.
 
