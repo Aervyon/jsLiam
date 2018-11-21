@@ -2,27 +2,29 @@
 
 A simple rich presence i made for the people of the dyno server. Repurpose it if you wish.
 
+I built this rich presence app to be customizable and lightweight at the same time, by making it so you can just use the terminal and notepad to edit it
+
 ## Required things
 
 - NodeJS 8.0.0+
-- A text editor that can handle JSON files (if you want to set it up differently), i think notepad wouldd work just fine.
+- A text editor that can handle JSON files (if you want to set it up differently), notepad will work just fine.
 - Terminal access
 
 ## Getting started
 
-- First install all dependencies (one) by running `npm install`
+- First install all dependencies (one) by running `npm install` (in the applications directory) in the terminal or by running the `install.bat` file (windows)
 
-- Then check if it works by doing `npm start`
+- Then check if it works by doing `npm start` (in the applications directory) in the terminal or by running the `start.bat` file (windows)
 
-- You can config it by using a file named `config.json` in the root of the application.
+- You can configure it by using a file named `config.json` in the root of the application.
 
-## Things to not do
+## A warning for if you use pm2
 
-- Do not use pm2. It makes it so you cannot reload, load, or unload (depending on if the config file exists) the config once the app is started
+Know what pm2 does, and how to use it if you want to use pm2. If you are using pm2 you should know how to reload the application, start the application, stop the application, and view the logs for the application
 
 ## Features
 
-- A hot reloadable configuration file. If you want to reload the configuration file, just type `refresh` into your terminal
+- A hot reloadable configuration file. If you want to reload the configuration file, just type `refresh` into your terminal (unless of course you are using pm2)
 
 - Easy configuration. The configuration keys are below, and are easy to understand (most of the time).
 
