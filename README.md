@@ -46,6 +46,24 @@ Know what pm2 does, and how to use it if you want to use pm2. If you are using p
 
 `smallImageText` - (optional) The small images text. Example: `"smallImageText": "Your as cold as ice."`. Default: `null`/Does not exist
 
+`state` - (optional) A static state, must be a string. Example: `"state": "We are always lurking..."`. Default: `null`/Does not exist
+
+## Want to git rid of the small or large image?
+
+Well, it has enough checks as is. You can disable the `smallImageKey` or `largeImageKey` by saying a asset you don't have... i usually just do something like `"smallImageKey": "disable"`.
+
 ### There is a example configuration file called `example.config.json`.
 
  If you are going to set something as `false`, `undefined`, `0`, or `null`, just remove the key. It is useless anyways if you set it to one of those.
+
+
+## If you want your own application that you control
+
+- Go to [the Discord Developer Dashboard](https://discordapp.com/developers/applications/)
+- Create a new application
+- Add some art assets under `Rich Presence` > `Art Assets` (you can have 150, and they must be atleast 512x512)
+- Get the applications clientId
+- Enter it (the clientID) into the config.json file
+- Go ham with customization
+
+Notice! Your application name will be your rich presence's name!

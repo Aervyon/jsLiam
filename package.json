@@ -1,13 +1,18 @@
 {
-  "name": "dyno_familiar_rpc",
+  "name": "dyno-member-presence",
   "version": "1.0.0",
-  "description": "A rich presence app for Dyno familiars",
+  "description": "A rich presence app for Dyno members",
   "main": "main.js",
   "scripts": {
     "start": "node main.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VoidNulll/dyno-member-presence"
+  },
   "author": "Null",
   "dependencies": {
+    "colors-cli": "^1.0.20",
     "discord-rpc": "^3.0.1"
   }
 }
