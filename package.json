@@ -1,6 +1,6 @@
 {
   "name": "dyno-member-presence",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "A rich presence app for Dyno members",
   "main": "main.js",
   "scripts": {

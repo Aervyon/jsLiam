@@ -1,0 +1,10 @@
+{
+  "clientId": "513462902053797903",
+  "timestamp": "false",
+  "quotes": "Pong!",
+  "largeImageKey": [ "dynoglitch", "dyno" ],
+  "largeImageText": "Dyno server icon",
+  "smallImageKey": "disable",
+  "state": "Ping!",
+  "staticQuote": true
+}

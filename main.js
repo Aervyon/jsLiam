@@ -18,13 +18,15 @@ let conf = false
 
 let timestamp = false
 
+let startTimestamp = new Date()
+
 let largeImageKey = 'dyno'
 
 let smallImageKey = 'dynoglitch'
 
-let largeText = null
+let largeText
 
-let smallText = null
+let smallText
 
 let state
 
@@ -45,33 +47,89 @@ const rl = readline.createInterface({
   prompt: 'Would you like to refresh the presence (refresh), or exit (exit)? '
 })
 
+let confi
+
+let rpc = new Discord.Client({ transport: 'ipc' })
+
 console.log(notice('Checking for config...'))
 
 if (fs.existsSync('./config.json')) {
   const config = require('./config.json')
   console.log(notice('Config found! Checking config'))
   if (config.largeImageKey) { // If there is a largeImageKey
-    largeImageKey = config.largeImageKey.toLowerCase() // Rewrite the largeImageKey
-    if (config.largeImageText) {
-      largeText = config.largeImageText
-    }
-    if (config.smallImageKey) { // If config has a small key
-      smallImageKey = config.smallImageKey.toLowerCase() // Overwrite the default smallImageKey
-      if (config.smallImageText) {
-        smallText = config.smallImageText
+    if (Array.isArray(config.largeImageKey)) {
+      let arra = []
+      for (let thing of config.largeImageKey) {
+        arra.push(thing.toLowerCase())
       }
+      largeImageKey = arra
+      console.log(notice(`largeImageKey noted! Count: ${arra.length}`))
+    } else if (typeof config.largeImageKey === 'string' && largeImageKey !== config.largeImageKey) {
+      if (config.largeImageKey.toLowerCase() === 'disable') {
+        largeImageKey = null
+        console.log('largeImageKey has been disabled!')
+      } else {
+        largeImageKey = config.largeImageKey.toLowerCase() // Overwrite the default smallImageKey
+        console.log(notice('largeImageKey noted!'))
+      }
+    } else {
+      console.log('Your large image key must either be a array or string!')
+    }
+    // Checks for config.largeImageText
+    if (config.largeImageText && typeof config.largeImageText === 'string') {
+      largeText = config.largeImageText
+    } else if (config.largeImageText && typeof config.largeImageText !== 'string') {
+      console.log(warn('Your configs largeImageText must be a string or not exist!'))
+      largeText = null
+    } else if (!config.largeImageText) largeText = null
+
+    if (config.smallImageKey) { // If config has a small key
+      if (Array.isArray(config.smallImageKey)) {
+        let arra = []
+        for (let thing of config.smallImageKey) {
+          arra.push(thing.toLowerCase())
+        }
+        smallImageKey = arra
+        console.log(notice(`smallImageKey noted! Count: ${arra.length}`))
+      } else if (typeof config.smallImageKey === 'string' && smallImageKey !== config.smallImageKey) {
+        if (config.smallImageKey.toLowerCase() === 'disable') {
+          smallImageKey = null
+          console.log('smallImageKey disabled')
+        } else {
+          smallImageKey = config.smallImageKey.toLowerCase() // Overwrite the default smallImageKey
+          console.log(notice('smallImageKey noted!'))
+        }
+      } else {
+        console.log('Your small image key must either be a array or string!')
+      }
+      if (config.smallImageText && typeof config.smallImageText === 'string') {
+        smallText = config.smallImageText
+      } else if (config.smallImageText && typeof config.smallImageText !== 'string') {
+        console.log(warn('Your configs smallImageText must be a string or not exist!'))
+        smallText = null
+      } else if (!config.smallImageText) smallText = null
     }
   }
-  if (!config.quotes) { // If no quotes in the config
-    //
-  } else if (config.quotes && config.quotes instanceof Array) { // If quotes are in the config and they are a array
+  if (!config.quotes && config.defaultQuotes && config.defaultQuotes === false) { // If no quotes in the config, config.defaultQuotes exists, and it does equal false
+    // Do nothing
+  } else if (!config.quotes && config.defaultQuotes && config.defaultQuotes !== false) {
+    quotes = null
+  } else if (config.quotes && Array.isArray(config.quotes)) { // If quotes are in the config and they are a array
     if (config.defaultQuotes && config.defaultQuotes === 'false') { // If defaultQuotes is in the config, and it equals 'false'. 'false' is basically saying 'disable the default quotes'
       quotes = config.quotes // Rewrite the quotes with the quotes in the config
     } else { // Everyone knows what else does, ye?
       quotes = quotes.concat(config.quotes) // Add quotes and the quotes in the config together
     }
   } else { // Everyone knows what else does, ye?
-    console.log(warn('I need your quotes to be in a array, otherwise i will not use them.')) // Inform the user that quotes need to be a array
+    if (config.staticQuote && config.quotes && config.staticQuote === true) {
+      if (typeof config.quotes === 'string') {
+        quotes = config.quotes
+      } else {
+        console.log(warn('So, you want to have a static quote.. but its not a string.. hmm, confusing.'))
+      }
+    } else {
+      console.log(warn('I am confused... Quotes can only be string (you need config.staticQuote to be true for this to work) and array.. So why is it neither or why do you not have staticQuotes set to true?'))
+    }
   }
   if (config.state && (typeof config.state !== 'string') === true) {
     console.log(warn('The state needs to be a string!'))
@@ -81,12 +139,14 @@ if (fs.existsSync('./config.json')) {
   if (config.clientId) {
     clientId = config.clientId
   }
-  if (config.timestamp && (config.timestamp === true || config.timestamp === 'true')) {
-    timestamp = true
+  // Timestamp checker
+  if (config.timestamp && (config.timestamp === true || config.timestamp === 'true')) { // If config.timestamp and config.timestamp is 'true'
+    timestamp = true // Turn on the timestamp
   } else if (!config.startTimestamp) {
     timestamp = 'Not found'
   }
   conf = true
+  confi = config
   console.log('Checked config.')
 } else {
   console.log(warn('Config not found. Do not worry, the app has been pre-setup. You can create the config and do \'refresh\' to gain access to the configuaration.'))
@@ -94,183 +154,88 @@ if (fs.existsSync('./config.json')) {
 
 let reloaded = false
 
-const startTimestamp = new Date()
-
 // The rpc function, so it can easily update the rpc
 
 function update () {
-  let rand = Math.round(Math.random() * (quotes.length - 1)) // Generates a random number, so it can be randomized.
-  let random = quotes[rand] // Get a random quote
-  if (conf === true) { // If the configuration exists
-    if (timestamp === false) { // If the timestamp is false
-      if (state) { // If state exists
-        if (largeText) { // If large text exists
-          if (smallText) { // If small text exists
-            rpc.setActivity({ // Set the users activiity
-              details: random,
-              largeImageKey: largeImageKey,
-              smallImageKey: smallImageKey,
-              largeImageText: largeText,
-              smallImageText: smallText,
-              state: state
-            })
-            return null // Stop
-          }
-          rpc.setActivity({ // Set the users activiity
-            details: random,
-            largeImageKey: largeImageKey,
-            smallImageKey: smallImageKey,
-            largeImageText: largeText,
-            state: state
-          })
-        } else { // If large text does not exist
-          if (smallText) { // If small text exists
-            rpc.setActivity({ // Set the users activiity
-              details: random,
-              largeImageKey: largeImageKey,
-              smallImageKey: smallImageKey,
-              smallImageText: smallText,
-              state: state
-            })
-            return null // Stop
-          }
-          // If small text does not exist
-          rpc.setActivity({ // Set the users activiity
-            details: random,
-            largeImageKey: largeImageKey,
-            smallImageKey: smallImageKey,
-            state: state
-          })
-        }
-      } else { // If state does not exist
-        if (largeText) { // If large text exists
-          if (smallText) { // If small text exists
-            rpc.setActivity({ // Set the users activiity
-              details: random,
-              largeImageKey: largeImageKey,
-              smallImageKey: smallImageKey,
-              largeImageText: largeText,
-              smallImageText: smallText
-            })
-            return null // Stop
-          }
-          rpc.setActivity({ // Set the users activiity
-            details: random,
-            largeImageKey: largeImageKey,
-            smallImageKey: smallImageKey,
-            largeImageText: largeText
-          })
-        } else { // If large text does not exist
-          if (smallText) { // If small text exists
-            rpc.setActivity({ // Set the users activiity
-              details: random,
-              largeImageKey: largeImageKey,
-              smallImageKey: smallImageKey,
-              smallImageText: smallText
-            })
-            return null // Stop
-          }
-          // If small text does not exist
-          rpc.setActivity({ // Set the users activiity
-            details: random,
-            largeImageKey: largeImageKey,
-            smallImageKey: smallImageKey
-          })
-        }
-      }
-    } else {
-      if (state) { // If state exists
-        if (largeText) { // If large text exists
-          if (smallText) { // If small text exists
-            rpc.setActivity({ // Set the users activiity
-              details: random,
-              largeImageKey: largeImageKey,
-              smallImageKey: smallImageKey,
-              largeImageText: largeText,
-              smallImageText: smallText,
-              startTimestamp,
-              state: state
-            })
-            return null // Stop
-          }
-          // If small text does not exist
-          rpc.setActivity({ // Set the users activiity
-            details: random,
-            largeImageKey: largeImageKey,
-            smallImageKey: smallImageKey,
-            largeImageText: largeText,
-            startTimestamp,
-            state: state
-          })
-        } else { // If large text does not exist
-          if (smallText) { // If small text
-            rpc.setActivity({ // Set the users activiity
-              details: random,
-              largeImageKey: largeImageKey,
-              smallImageKey: smallImageKey,
-              smallImageText: smallText,
-              startTimestamp,
-              state: state
-            })
-            return null // Stop
-          }
-          rpc.setActivity({ // Set the users activiity
-            details: random,
-            largeImageKey: largeImageKey,
-            smallImageKey: smallImageKey,
-            startTimestamp,
-            state: state
-          })
-        }
-      } else { // If state does not exist
-        if (largeText) { // If large text exists
-          if (smallText) { // If small text exists
-            rpc.setActivity({ // Set the users activiity
-              details: random,
-              largeImageKey: largeImageKey,
-              smallImageKey: smallImageKey,
-              largeImageText: largeText,
-              smallImageText: smallText,
-              startTimestamp
-            })
-            return null // Stop
-          }
-          // If small text does not exist
-          rpc.setActivity({ // Set the users activiity
-            details: random,
-            largeImageKey: largeImageKey,
-            smallImageKey: smallImageKey,
-            largeImageText: largeText,
-            startTimestamp
-          })
-        } else { // If large text does not exist
-          if (smallText) { // If small text
-            rpc.setActivity({ // Set the users activiity
-              details: random,
-              largeImageKey: largeImageKey,
-              smallImageKey: smallImageKey,
-              smallImageText: smallText,
-              startTimestamp
-            })
-            return null // Stop
-          }
-          rpc.setActivity({ // Set the users activiity
-            details: random,
-            largeImageKey: largeImageKey,
-            smallImageKey: smallImageKey,
-            startTimestamp
-          })
-        }
-      }
-    }
+  let largeImageK = largeImageKey // Define largeImageK
+  if (largeImageKey && Array.isArray(largeImageKey)) { // If largeImagekey and it is a array
+    // Generate a random number
+    let rando = Math.round(Math.random() * (largeImageKey.length) - 1)
+    // If the random number is below 0, make it 0
+    if (rando < 0) rando = 0
+    else if (rando > largeImageKey.length) rando = largeImageKey.length// If the random number is more then the largeImageKey's array length, make it the length of the aray
+    largeImageK = largeImageKey[rando]
   }
+  let smallImageK = smallImageKey
+  if (smallImageKey && Array.isArray(smallImageKey)) { // If smallImageKey and it is a array
+    // Generate a random number
+    let rando = Math.round(Math.random() * (smallImageKey.length) - 1)
+    // If the random number is below 0, make it 0
+    if (rando < 0) rando = 0
+    else if (rando > smallImageKey.length) rando = smallImageKey.length // If the random number is more then the smallImageKey's array length, make it the length of the aray
+    smallImageK = smallImageKey[rando]
+  }
+  let random = quotes // Define random as quotes
+  if (quotes && Array.isArray(quotes)) { // If quotes, and they are a array
+    // Generate a random number
+    let rand = Math.round(Math.random() * (quotes.length - 1))
+    // If the random number is below zero, set it to zero
+    if (rand < 0) rand = 0
+    else if (rand > quotes.length) rand = quotes.length // If the random number is more then the quotes array length, make the number the length of the array
+    random = quotes[rand] // Get a random quote
+  }
+  // Most efficient way i can think of to set the presence.
+  let stuff = {}
+  // Simple checks, eh?
+  if (largeImageK) stuff.largeImageKey = largeImageK
+  if (smallImageK) stuff.smallImageKey = smallImageK
+  if (!conf) {
+    stuff.startTimestamp = startTimestamp
+  } else {
+    if (timestamp !== false) stuff.startTimestamp = startTimestamp
+  }
+  if (smallText) stuff.smallImageText = smallText
+  if (largeText) stuff.largeImageText = largeText
+  if (state) stuff.state = state
+  if (random) stuff.details = random
+  rpc.setActivity(stuff) // Set the activity as the object. Less checks, better reliability, more options, // less time
 }
 
 function sleep (time) {
   return new Promise((resolve) => setTimeout(resolve, time))
 }
 
-function reload () { // Reload the config
+/**
+ * The function that makes it so you can login to another rich presence application while running
+*/
+
+async function refreshclient () {
+  if (reloaded === true) return console.log(warn('Try again later.'))
+  let config = confi // reload the config
+  await sleep(1000)
+  await rpc.destroy()
+  rpc = new Discord.Client({ transport: 'ipc' })
+  await sleep(1000) // Pause for a second
+  if (!config) throw Error('Error while refreshing the client! There was no config found!') // if no config, error
+  else if (!config.clientId) throw Error('Error while refreshing the client! I need a clientId to refresh to!') // if no clientId in the config, error
+  else if (config.clientId === clientId) console.log(warn('Cannot refresh! The clientId in the config was the same as the one already in use.')) // if the clientId in the config and the clientId (main.js) are the same, warn
+  else if (config.clientId && config.clientId !== clientId) {
+    clientId = config.clientId
+    await rpc.connect(clientId)
+    await sleep(1000) // Pause for a second
+    console.log(notice('Client has been refreshed!'))
+    await update()
+    rl.prompt()
+  }
+}
+
+/**
+ * reload the configuration (except the clientId)
+ * @param {Boolean} update Whether or not to update the config
+ * @param {Boolean} prompt Whether or not to set the prompt
+ */
+
+async function reload (set, prompt) { // Reload the config
   if (reloaded === true) { // If reloaded is set to true (its a cooldown)
     console.log(warn('Try again later.')) // Log that the user can try again later
     rl.prompt() // Show the prompt
@@ -286,105 +251,168 @@ function reload () { // Reload the config
   quotes = [ 'Annoying the staff', 'Minimodding', 'Travelling the dyno world', 'Interfering in support', 'Arguing with the staff', 'Reviving chat', 'Arguing with council', 'Talking about Dyno' ] // Redifine quotes
   delete require.cache[require.resolve('./config.json')] // Remove the require cache for config.json
   const config = require('./config.json') // Require the config
+  let configuration = config
+  // Key checker!
   if (config.largeImageKey) { // If there is a largeImageKey
-    if (largeImageKey !== config.largeImageKey.toLowerCase()) { // If the currentt does not equal the configs
-      largeImageKey = config.largeImageKey.toLowerCase() // Rewrite the largeImageKey
-      console.log(notice('Updated the large image')) // Log that the largeImageKey was updated
-    }
-    if (config.largeImageText) {
-      if (config.largeImageText !== largeText) {
-        largeText = config.largeImageText
-        console.log(notice('Updated the large image text'))
+    if (Array.isArray(config.largeImageKey)) {
+      let arra = []
+      for (let thing of config.largeImageKey) {
+        arra.push(thing.toLowerCase())
+      }
+      largeImageKey = arra
+      console.log(notice(`largeImageKey refreshed! Count: ${arra.length}`))
+    } else if (typeof config.largeImageKey === 'string' && largeImageKey !== config.largeImageKey) {
+      if (config.largeImageKey.toLowerCase() === 'disable') {
+        largeImageKey = null
+        console.log('largeImageKey disabled')
+      } else {
+        largeImageKey = config.largeImageKey.toLowerCase() // Overwrite the default smallImageKey
+        console.log(notice('largeImageKey refreshed!'))
       }
     } else {
-      largeText = null
-      console.log(notice('Large text: off'))
+      if (typeof config.largeImageKey !== 'string' || Array.isArray(config.largeImageKey)) console.log('Your large image key must either be a array or string!')
     }
+    // Checks the configs largeImageText
+    if (config.largeImageText && typeof config.largeImageText === 'string' && config.largeImageText !== largeText) {
+      largeText = config.largeImageText
+    } else if (config.largeImageText && typeof config.largeImageText !== 'string') {
+      console.log(warn('Your configs largeImageText must be a string or not exist!'))
+      largeText = null
+    } else if (!config.largeImageText) largeText = null
+    // For the small image key
     if (config.smallImageKey) { // If config has a small key
-      if (smallImageKey !== config.smallImageKey.toLowerCase()) { // if smallImagekey does not equal the configs smallImageKey
-        smallImageKey = config.smallImageKey.toLowerCase() // Overwrite the default smallImageKey
-        console.log(notice('Updated the small image')) // Tell the user the small image was updated
-      }
-      if (config.smallImageText) {
-        if (config.smallImageText !== smallText) {
-          smallText = config.smallImageText
-          console.log(notice('Updated the small image text!')) // Log that the small text was updated
+      if (Array.isArray(config.smallImageKey)) {
+        let arra = []
+        for (let thing of config.smallImageKey) {
+          arra.push(thing.toLowerCase())
+        }
+        smallImageKey = arra
+        console.log(`smallImageKey refreshed! Count: ${arra.length}`)
+      } else if (typeof config.smallImageKey === 'string' && smallImageKey !== config.smallImageKey) {
+        if (config.smallImageKey.toLowerCase() === 'disable') {
+          smallImageKey = null
+          console.log('smallImageKey disabled')
+        } else {
+          smallImageKey = config.smallImageKey.toLowerCase() // Overwrite the default smallImageKey
+          console.log(notice('smallImageKey refreshed!'))
         }
       } else {
-        smallText = null
-        console.log(notice('Small text: off'))
+        if (typeof config.smallImageKey !== 'string' || Array.isArray(config.smallImageKey)) console.log('Your small image key must either be a array or string!')
       }
+      if (config.smallImageText && typeof config.smallImageText === 'string' && config.smallImageText !== smallText) {
+        smallText = config.smallImageText
+      } else if (config.smallImageText && typeof config.smallImageText !== 'string') {
+        console.log(warn('Your configs smallImageText must be a string or not exist!'))
+        smallText = null
+      } else if (!config.smallImageText) smallText = null
     }
   }
-  if (!config.quotes) { // If no quotes
-    //
-  } else if (config.quotes && config.quotes instanceof Array) { // If quotes, and quotes are a array
+  // Quote checker
+  if (!config.quotes && config.defaultQuotes && config.defaultQuotes === true) { // If no quotes in the config, config.defaultQuotes exists, and it does equal false
+    // Do nothing
+  } else if (!config.quotes && config.defaultQuotes && config.defaultQuotes !== true) { // If no quotes, defaultQuotes exists in the config, and it does not equal false
+    quotes = null // Make quotes = null
+  } else if (!config.quotes && !config.defaultQuotes) { // If not quotes, and no default quotes
+    // Do nothing
+  } else if (config.quotes && Array.isArray(config.quotes)) { // If quotes, and quotes are a array
     if (config.defaultQuotes && config.defaultQuotes === 'false') { // If defaultQuotes is in the config, and it equals 'false'. 'false' is basically saying 'disable the default quotes'
       quotes = config.quotes // Rewrite the quotes with the quotes in the config
-      console.log(notice(`Quotes loaded: ${quotes.length}`)) // Log that quotes were loaded.
+      await console.log(notice(`Quotes loaded: ${quotes.length}`)) // Log that quotes were loaded.
     } else { // Everyone knows what else does, ye?
       quotes = quotes.concat(config.quotes) // Add quotes and the quotes in the config together
-      console.log(notice(`Quotes added: ${config.quotes.length}`)) // Signale that quotes were added
-      console.log(notice(`Total Quotes: ${quotes.length}`)) // Log how many quotes there are in total
+      await console.log(notice(`Quotes added: ${config.quotes.length}`)) // Signale that quotes were added
+      await console.log(notice(`Total Quotes: ${quotes.length}`)) // Log how many quotes there are in total
     }
-  } else { // If none of the condidtions above
-    console.log(warn('I need your quotes to be in a array, otherwise i will not use them.')) // Tell the user it needs quotes in a array
+  } else if (config.staticQuote && config.quotes && config.staticQuote === true) {
+    if (typeof config.quotes === 'string') {
+      quotes = config.quotes
+    } else {
+      await console.log(warn('So, you want to have a static quote.. but its not a string.. hmm, confusing.'))
+    }
+  } else {
+    await console.log(warn('I am confused... Quotes can only be string (you need config.staticQuote to be true for this to work) and array.. So why is it neither or why do you not have staticQuotes set to true?'))
   }
+  // State checker
   if (!config.state && !state) {
     //
   } else if (!config.state && state) {
     state = null
-    console.log(notice('Updated your state to \'none\'!'))
+    await console.log(notice('Updated your state to \'none\'!'))
   } else if (config.state && (typeof config.state === 'string')) {
     if (state !== config.state) {
       state = config.state
-      console.log(notice(`Updated your state to: '${state}'`))
+      await console.log(notice(`Updated your state to: '${state}'`))
     }
   } else if (config.state && !(typeof config.state === 'string')) {
-    console.log(warn('The state needs to be a string.'))
+    await console.log(warn('The state needs to be a string.'))
   }
-  if (config.timestamp && (config.timestamp === true || config.timestamp === 'true')) { // If config timestamp is enmabled
+  if (config.timestamp && (config.timestamp === true || config.timestamp === 'true') && timestamp !== true) { // If config timestamp is enmabled
     timestamp = true // Enable the timestamp
-    console.log(notice('Timestamp: true')) // Tell the user the timestamp is enabled
-  } else if (config.timestamp && config.timestamp === 'false') { // If config timestamp is false
+    await console.log(notice('Timestamp: true')) // Tell the user the timestamp is enabled
+  } else if (config.timestamp && config.timestamp === 'false' && timestamp !== false) { // If config timestamp is false
     timestamp = false // Tell the app the timestamp is false
-    console.log(notice('Timestamp: false')) // Tell the user the timestamp is false
+    await console.log(notice('Timestamp: false')) // Tell the user the timestamp is false
+  } else if (config.timestamp && config.timestamp === 'now') {
+    timestamp = true // Turn on the timestamp
+    startTimestamp = new Date() // Redefine startTimestamp
+    let existed = false
+    if (fs.existsSync('./oldConfig.json')) existed = true
+    await fs.writeFile('./oldConfig.json', JSON.stringify(config, null, 2), (err) => {
+      if (err) throw err
+      else {
+        if (!existed) console.log('Created a backup JSON file called "oldConfig.json"!')
+        else console.log('Updated the backup JSON file called "oldConfig.json"!')
+      }
+    })
+    await sleep(500) // Pause for .5 seconds
+    configuration = config // define configuration as config
+    configuration.timestamp = 'true' // redefine the timestamp as 'true'
+    await fs.writeFile('./config.json', JSON.stringify(configuration, null, 2), (err) => {
+      if (err) throw err
+      else console.log('Updated timestamp!')
+    }) // Write the file (save)
+    await sleep(500) // Pause for .5 seconds
   } else if (!config.timestamp) { // If no timestamp
     timestamp = 'Not found' // Timestamp is 'Not found'
   }
+  confi = configuration
   conf = true // Tell the application that there is a configuration file
-  update() // Call the update function
-  console.log(notice('Reloaded the config!')) // Log that the config has been reloaded
-  rl.prompt() // Send the prompt
+  if (set === true) await update()
+  await console.log(notice('Reloaded the config!')) // Log that the config has been reloaded
+  await sleep(500) // Pause for .5 seconds
+  if (prompt === true) rl.prompt() // Send the prompt
 }
 
 rl.on('line', async (line) => { // When the council gets a new line
   if (line.toLowerCase() === 'refresh') { // If line equals 'refresh'
-    reload() // Reload the config
+    reload(true, true) // Reload the config
     reloaded = true // Set reloaded to true (cooldown)
     await sleep(15000) // Wait for 15 seconds
     reloaded = false // Set reloaded to false (cooldown off)
   } else if (line.toLowerCase() === 'exit') { // If line equals exit
     process.exit() // Exit the process
+  } else if (line.toLowerCase() === 'refreshclient') {
+    refreshclient()
+    reloaded = true // Set reloaded to true (cooldown)
+    await sleep(15000) // Wait for 15 seconds
+    reloaded = false // Set reloaded to false (cooldown off)
   } else { // If none above
     rl.prompt() // Return the prompt
   }
 })
 
-const rpc = new Discord.Client({ transport: 'ipc' })
-
 // When the rpc starts
 
 let packge = require('./package.json')
 
-rpc.on('ready', () => {
+rpc.on('ready', async () => {
   console.log(`Started! ${packge.name} (${packge.version}) by: ${packge.author}\nRepo: ${packge.repository.url}\nUser: ${rpc.user.username}`)
-  update()
+  await update()
   rl.prompt()
-  setInterval(() => {
-    update()
-    console.log(notice('\nUpdated status!'))
-    rl.prompt()
+  setInterval(() => { // Every 5 minutes...
+    update() // Update the status, then...
+    console.log(notice('\nUpdated status!')) // Log that the status was update, finally...
+    rl.prompt() // Show the prompt again to the user
   }, 300000)
 })
 
@@ -396,6 +424,6 @@ rpc.on('error', (err) => {
 
 // Log in to the rich presence
 
-rpc.login({ clientId }).catch(console.error)
+rpc.login({ clientId }).catch(console.error) // Log in and catch any errors
 
-console.log(notice(`${quotes.length} quotes Loaded.`))
+if (quotes && Array.isArray(quotes)) console.log(notice(`Quotes loaded: ${quotes.length}`)) // If quotes exists, and quotes are a array, log how many quotes there are
