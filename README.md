@@ -34,13 +34,13 @@ Know what pm2 does, and how to use it if you want to use pm2. If you are using p
 
 `clientId` - (optional) The clientId of the discord developers application you want to use (Can be changed once app is running by saying `refreshclient` to the terminal)
 
-`staticQuote` - (optional) Makes the quote static, but the quote needs to be a string. If the quote is not a string, it will error out. Allowed values: `true` - Makes the quote static, `false` (useless) Does nothing, the quotes rotate (quotes must be a array for this)
+`staticQuote` - (optional) Makes the quote static, but the quote needs to be a string. If the quote is not a string, it will error out. Allowed values: `'true'` - Makes the quote static. Example: `"staticQuote": "true"`
 
 `timestamp` - (optional) Whether or not you want a beginning timestamp. Allowed values: `true`, or `"true"` - Makes sure the timestamp is on. `"now"` - Resets the timestamp to the current date when you refresh, rewrites your config and makes a backup called "oldConfig.json" Default: `true`
 
 `defaultQuotes` - (optional) Whether or not you want the default quotes on. Allowed values: `'false'` - Disables the default quotes. Default: `true`
 
-`quotes` - (optional) Additional quotes (unless `defaultQuotes` is `'false'`). Can be a single quote if `"staticQuote"` is `true` Example: `[ "ping", "pong" ]`, `"Pong!"`
+`quotes` - (optional) Additional quotes (unless `defaultQuotes` is `'false'`). Can be a single quote if `"staticQuote"` is `'true'` Example: `[ "ping", "pong" ]`, `"Pong!"`
 
 `largeImageKey` - (optional) The large image of the presence. Example: `"largeImageKey": "trees"`, `"largeImageKey": "[ "trees", "city" ]"`, `"largeImageKey": "disable"`. Default: `"dyno"`
 
@@ -52,13 +52,13 @@ Know what pm2 does, and how to use it if you want to use pm2. If you are using p
 
 `state` - (optional) A static state, must be a string. Example: `"state": "We are always lurking..."`. Default: `null`/Does not exist
 
-## Want to git rid of the small or large image?
+## Want to get rid of the small or large image?
 
 all you simply need to do is put `"disable"` after the key you want to disable. Example: `"smallImageKey": "disable"`
 
 ### There is a example configuration file called `example.config.json`.
 
- If you are going to set something as `false`, `undefined`, `0`, or `null`, just remove the key. It is useless anyways if you set it to one of those.
+ If you are going to set something as `false`, `undefined`, `0`, or `null`, just remove the key. It is useless then anyways.
 
  - There is `altExample.config.json` to show a example of a alternate configuration
 

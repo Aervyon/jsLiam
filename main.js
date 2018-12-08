@@ -44,7 +44,7 @@ const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 
-  prompt: 'Would you like to refresh the presence (refresh), or exit (exit)? '
+  prompt: 'Would you like to refresh the presence (refresh), refresh your client aka log in as another app (refreshclient), or exit (exit)? '
 })
 
 let confi
@@ -110,7 +110,7 @@ if (fs.existsSync('./config.json')) {
       } else if (!config.smallImageText) smallText = null
     }
   }
-  if (!config.quotes && config.defaultQuotes && config.defaultQuotes === false) { // If no quotes in the config, config.defaultQuotes exists, and it does equal false
+  if (!config.quotes && config.defaultQuotes && config.defaultQuotes === 'false') { // If no quotes in the config, config.defaultQuotes exists, and it does equal false
     // Do nothing
   } else if (!config.quotes && config.defaultQuotes && config.defaultQuotes !== false) {
     quotes = null
@@ -121,7 +121,7 @@ if (fs.existsSync('./config.json')) {
       quotes = quotes.concat(config.quotes) // Add quotes and the quotes in the config together
     }
   } else { // Everyone knows what else does, ye?
-    if (config.staticQuote && config.quotes && config.staticQuote === true) {
+    if (config.staticQuote && config.quotes && config.staticQuote === 'true') {
       if (typeof config.quotes === 'string') {
         quotes = config.quotes
       } else {
@@ -308,9 +308,9 @@ async function reload (set, prompt) { // Reload the config
     }
   }
   // Quote checker
-  if (!config.quotes && config.defaultQuotes && config.defaultQuotes === true) { // If no quotes in the config, config.defaultQuotes exists, and it does equal false
+  if (!config.quotes && config.defaultQuotes && config.defaultQuotes === 'true') { // If no quotes in the config, config.defaultQuotes exists, and it does equal false
     // Do nothing
-  } else if (!config.quotes && config.defaultQuotes && config.defaultQuotes !== true) { // If no quotes, defaultQuotes exists in the config, and it does not equal false
+  } else if (!config.quotes && config.defaultQuotes && config.defaultQuotes !== 'true') { // If no quotes, defaultQuotes exists in the config, and it does not equal false
     quotes = null // Make quotes = null
   } else if (!config.quotes && !config.defaultQuotes) { // If not quotes, and no default quotes
     // Do nothing
@@ -323,7 +323,7 @@ async function reload (set, prompt) { // Reload the config
       await console.log(notice(`Quotes added: ${config.quotes.length}`)) // Signale that quotes were added
       await console.log(notice(`Total Quotes: ${quotes.length}`)) // Log how many quotes there are in total
     }
-  } else if (config.staticQuote && config.quotes && config.staticQuote === true) {
+  } else if (config.staticQuote && config.quotes && config.staticQuote === 'true') {
     if (typeof config.quotes === 'string') {
       quotes = config.quotes
     } else {
