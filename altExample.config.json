@@ -1,10 +1,11 @@
 {
   "clientId": "513462902053797903",
   "timestamp": "true",
-  "quotes": "Pong!",
-  "largeImageKey": [ "dynoglitch", "dyno" ],
-  "largeImageText": "Dyno server icon",
-  "smallImageKey": "disable",
-  "state": "Ping!",
-  "staticQuote": "true"
+  "largeImageKey": ["code", "bot"],
+  "quotes": "Coding a bot (adding documentation)",
+  "smallImageKey": "code",
+  "state": "Step",
+  "staticQuote": "true",
+  "maxPartySize": "3",
+  "partySize": "2"
 }

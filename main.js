@@ -20,9 +20,13 @@ let timestamp = false
 
 let startTimestamp = new Date()
 
-let largeImageKey = 'dyno'
+let partySize
 
-let smallImageKey = 'dynoglitch'
+let partyMax
+
+let largeImageKey = 'jsliam'
+
+let smallImageKey
 
 let largeText
 
@@ -32,7 +36,7 @@ let state
 
 let clientId = '513462902053797903'
 
-let quotes = [ 'Annoying the staff', 'Minimodding', 'Travelling the dyno world', 'Interfering in support', 'Arguing with the staff', 'Reviving chat', 'Arguing with council', 'Talking about Dyno' ]
+let quotes = [ 'Running around discord servers.', 'Lurking', 'Annoying the staff' ]
 
 const notice = color.cyan_bt
 
@@ -82,7 +86,7 @@ if (fs.existsSync('./config.json')) {
       console.log(warn('Your configs largeImageText must be a string or not exist!'))
       largeText = null
     } else if (!config.largeImageText) largeText = null
-
+    // Checks for config.smallImageKey
     if (config.smallImageKey) { // If config has a small key
       if (Array.isArray(config.smallImageKey)) {
         let arra = []
@@ -92,28 +96,27 @@ if (fs.existsSync('./config.json')) {
         smallImageKey = arra
         console.log(notice(`smallImageKey noted! Count: ${arra.length}`))
       } else if (typeof config.smallImageKey === 'string' && smallImageKey !== config.smallImageKey) {
-        if (config.smallImageKey.toLowerCase() === 'disable') {
-          smallImageKey = null
-          console.log('smallImageKey disabled')
-        } else {
-          smallImageKey = config.smallImageKey.toLowerCase() // Overwrite the default smallImageKey
-          console.log(notice('smallImageKey noted!'))
-        }
+        smallImageKey = config.smallImageKey.toLowerCase() // Overwrite the default smallImageKey
+        console.log(notice('smallImageKey noted!'))
       } else {
         console.log('Your small image key must either be a array or string!')
       }
+      //
       if (config.smallImageText && typeof config.smallImageText === 'string') {
         smallText = config.smallImageText
       } else if (config.smallImageText && typeof config.smallImageText !== 'string') {
         console.log(warn('Your configs smallImageText must be a string or not exist!'))
         smallText = null
       } else if (!config.smallImageText) smallText = null
-    }
+    } else if (!config.smallImageKey) smallImageKey = null
   }
-  if (!config.quotes && config.defaultQuotes && config.defaultQuotes === 'false') { // If no quotes in the config, config.defaultQuotes exists, and it does equal false
-    // Do nothing
-  } else if (!config.quotes && config.defaultQuotes && config.defaultQuotes !== false) {
-    quotes = null
+  if (!config.quotes) { // If no quotes in the config
+    if (config.defaultQuotes && config.defaultQuotes !== 'true') quotes = null // If defaultQuotes, and defaultQuotes does not equal 'true'... nullify quotes
+    else if (!config.defaultQuotes) { // If no defaultQuotes
+      // Do nothing
+    } else { // If none of the statements above covered
+      // Do nothing
+    }
   } else if (config.quotes && Array.isArray(config.quotes)) { // If quotes are in the config and they are a array
     if (config.defaultQuotes && config.defaultQuotes === 'false') { // If defaultQuotes is in the config, and it equals 'false'. 'false' is basically saying 'disable the default quotes'
       quotes = config.quotes // Rewrite the quotes with the quotes in the config
@@ -144,6 +147,36 @@ if (fs.existsSync('./config.json')) {
     timestamp = true // Turn on the timestamp
   } else if (!config.startTimestamp) {
     timestamp = 'Not found'
+  }
+  // Party size checker
+  if (config.maxPartySize && config.state && typeof config.state === 'string') {
+    // partyMax checker
+    if (Number(config.maxPartySize) > 100) partyMax = 100
+    else if (Number(config.maxPartySize < 1)) partyMax = 1
+    else partyMax = Number(config.maxPartySize)
+    // partySize checker
+    if (!config.partySize) partySize = 1
+    else {
+      if (Number(config.partySize) > 100) partySize = 100
+      else if (Number(config.partySize) < 1) partySize = 1
+      else if (Number(config.partySize) > Number(config.maxPartySize)) partySize = Number(config.maxPartySize)
+      else partySize = Number(config.partySize)
+    }
+    //
+  } else if (!config.maxPartySize && config.partySize) {
+    //
+    if (!config.state) console.log(error('You need a state and config.maxPartySize to even use config.partySize!'))
+    else if (typeof config.state !== 'string') console.log(error('You need the state to be a string, and maxPartySize to even use config.partySize!'))
+    else console.log(error('You ned a maxPartySize to even use config.partySize!'))
+    //
+  } else if (config.maxPartySize && (!config.state || typeof config.state !== 'string')) {
+    //
+    if (config.maxPartySize && !config.state) console.log(error('You need a state in order to use config.maxPartySize!'))
+    else if (config.maxPartySize && typeof config.state !== 'string') console.log(error('You need your state to be a string, for config.maxPartySize to work!'))
+    //
+  }
+  if (state && partyMax) {
+    console.log(`State: ${state} (${partySize} of ${partyMax})`)
   }
   conf = true
   confi = config
@@ -187,17 +220,21 @@ function update () {
   // Most efficient way i can think of to set the presence.
   let stuff = {}
   // Simple checks, eh?
-  if (largeImageK) stuff.largeImageKey = largeImageK
-  if (smallImageK) stuff.smallImageKey = smallImageK
-  if (!conf) {
-    stuff.startTimestamp = startTimestamp
-  } else {
-    if (timestamp !== false) stuff.startTimestamp = startTimestamp
+  if (largeImageK) stuff.largeImageKey = largeImageK // The presences largeImageKey
+  if (smallImageK) stuff.smallImageKey = smallImageK // The presences smallImageKey
+  if (!conf) { // If no config
+    stuff.startTimestamp = startTimestamp // stuff.startTimestamp (the presence timestamp) is startTimestamp (the start time of the app)
+  } else { // else
+    if (timestamp !== false) stuff.startTimestamp = startTimestamp // if timestamp does not equal false, the presence startTimeStamp is startTimestamp
   }
-  if (smallText) stuff.smallImageText = smallText
-  if (largeText) stuff.largeImageText = largeText
-  if (state) stuff.state = state
-  if (random) stuff.details = random
+  if (smallText) stuff.smallImageText = smallText // The smallImageText of the presence
+  if (largeText) stuff.largeImageText = largeText // The largeImageText of the presence
+  if (state) stuff.state = state // The state of the presence
+  if (random) stuff.details = random // The details of the presence
+  if (partyMax) { // If partyMax exists, do party stuff
+    stuff.partySize = partySize
+    stuff.partyMax = partyMax
+  }
   rpc.setActivity(stuff) // Set the activity as the object. Less checks, better reliability, more options, // less time
 }
 
@@ -248,7 +285,7 @@ async function reload (set, prompt) { // Reload the config
     return null // Stop the function
   }
   console.log(notice('Reloading config')) // Tell the user the config is reloading
-  quotes = [ 'Annoying the staff', 'Minimodding', 'Travelling the dyno world', 'Interfering in support', 'Arguing with the staff', 'Reviving chat', 'Arguing with council', 'Talking about Dyno' ] // Redifine quotes
+  quotes = [ 'Running around discord servers.', 'Lurking', 'Annoying the staff' ]
   delete require.cache[require.resolve('./config.json')] // Remove the require cache for config.json
   const config = require('./config.json') // Require the config
   let configuration = config
@@ -270,7 +307,7 @@ async function reload (set, prompt) { // Reload the config
         console.log(notice('largeImageKey refreshed!'))
       }
     } else {
-      if (typeof config.largeImageKey !== 'string' || Array.isArray(config.largeImageKey)) console.log('Your large image key must either be a array or string!')
+      if (config.largeImageKey && (typeof config.largeImageKey !== 'string' || Array.isArray(config.largeImageKey))) console.log('Your large image key must either be a array or string!')
     }
     // Checks the configs largeImageText
     if (config.largeImageText && typeof config.largeImageText === 'string' && config.largeImageText !== largeText) {
@@ -289,31 +326,55 @@ async function reload (set, prompt) { // Reload the config
         smallImageKey = arra
         console.log(`smallImageKey refreshed! Count: ${arra.length}`)
       } else if (typeof config.smallImageKey === 'string' && smallImageKey !== config.smallImageKey) {
-        if (config.smallImageKey.toLowerCase() === 'disable') {
-          smallImageKey = null
-          console.log('smallImageKey disabled')
-        } else {
-          smallImageKey = config.smallImageKey.toLowerCase() // Overwrite the default smallImageKey
-          console.log(notice('smallImageKey refreshed!'))
-        }
+        smallImageKey = config.smallImageKey.toLowerCase() // Overwrite the default smallImageKey
+        console.log(notice('smallImageKey refreshed!'))
       } else {
-        if (typeof config.smallImageKey !== 'string' || Array.isArray(config.smallImageKey)) console.log('Your small image key must either be a array or string!')
+        if (config.smallImageKey && (typeof config.smallImageKey !== 'string' || Array.isArray(config.smallImageKey))) console.log('Your small image key must either be a array or string!')
       }
+      // Checks for config.smallImageText
       if (config.smallImageText && typeof config.smallImageText === 'string' && config.smallImageText !== smallText) {
         smallText = config.smallImageText
       } else if (config.smallImageText && typeof config.smallImageText !== 'string') {
         console.log(warn('Your configs smallImageText must be a string or not exist!'))
         smallText = null
       } else if (!config.smallImageText) smallText = null
+    } else if (!config.smallImageKey) smallImageKey = null
+  }
+  // Party Size checker.
+  if (config.maxPartySize && config.state && typeof config.state === 'string') {
+    // partyMax checker
+    if (Number(config.maxPartySize) > 100) partyMax = 100
+    else if (Number(config.maxPartySize < 1)) partyMax = 1
+    else partyMax = Number(config.maxPartySize)
+    // partySize checker
+    if (!config.partySize) partySize = 1
+    else {
+      if (Number(config.partySize) > 100) partySize = 100
+      else if (Number(config.partySize) < 1) partySize = 1
+      else if (Number(config.partySize) > Number(config.maxPartySize)) partySize = Number(config.maxPartySize)
+      else partySize = Number(config.partySize)
     }
+    //
+  } else if (!config.maxPartySize && config.partySize) {
+    //
+    if (!config.state) console.log(error('You need a state and config.maxPartySize to even use config.partySize!'))
+    else if (typeof config.state !== 'string') console.log(error('You need the state to be a string, and maxPartySize to even use config.partySize!'))
+    else console.log(error('You ned a maxPartySize to even use config.partySize!'))
+    //
+  } else if (config.maxPartySize && (!config.state || typeof config.state !== 'string')) {
+    //
+    if (config.maxPartySize && !config.state) console.log(error('You need a state in order to use config.maxPartySize!'))
+    else if (config.maxPartySize && typeof config.state !== 'string') console.log(error('You need your state to be a string, for config.maxPartySize to work!'))
+    //
   }
   // Quote checker
-  if (!config.quotes && config.defaultQuotes && config.defaultQuotes === 'true') { // If no quotes in the config, config.defaultQuotes exists, and it does equal false
-    // Do nothing
-  } else if (!config.quotes && config.defaultQuotes && config.defaultQuotes !== 'true') { // If no quotes, defaultQuotes exists in the config, and it does not equal false
-    quotes = null // Make quotes = null
-  } else if (!config.quotes && !config.defaultQuotes) { // If not quotes, and no default quotes
-    // Do nothing
+  if (!config.quotes) { // If no quotes in the config
+    if (config.defaultQuotes && config.defaultQuotes !== 'true') quotes = null // If defaultQuotes, and defaultQuotes does not equal 'true'... nullify quotes
+    else if (!config.defaultQuotes) { // If no defaultQuotes
+      // Do nothing
+    } else { // If none of the statements above covered
+      // Do nothing
+    }
   } else if (config.quotes && Array.isArray(config.quotes)) { // If quotes, and quotes are a array
     if (config.defaultQuotes && config.defaultQuotes === 'false') { // If defaultQuotes is in the config, and it equals 'false'. 'false' is basically saying 'disable the default quotes'
       quotes = config.quotes // Rewrite the quotes with the quotes in the config
@@ -327,10 +388,10 @@ async function reload (set, prompt) { // Reload the config
     if (typeof config.quotes === 'string') {
       quotes = config.quotes
     } else {
-      await console.log(warn('So, you want to have a static quote.. but its not a string.. hmm, confusing.'))
+      await console.log(warn('So, you want to have a static quote.. but its not a string. It needs to be a string!'))
     }
   } else {
-    await console.log(warn('I am confused... Quotes can only be string (you need config.staticQuote to be true for this to work) and array.. So why is it neither or why do you not have staticQuotes set to true?'))
+    await console.log(warn('Quotes can only be string (you need config.staticQuote to be true for this to work) and array.. So why is it neither or why do you not have staticQuotes set to true?'))
   }
   // State checker
   if (!config.state && !state) {
@@ -375,6 +436,9 @@ async function reload (set, prompt) { // Reload the config
   } else if (!config.timestamp) { // If no timestamp
     timestamp = 'Not found' // Timestamp is 'Not found'
   }
+  if (state && partyMax) {
+    console.log(`Full state: ${state} (${partySize} of ${partyMax})`)
+  }
   confi = configuration
   conf = true // Tell the application that there is a configuration file
   if (set === true) await update()
@@ -390,6 +454,7 @@ rl.on('line', async (line) => { // When the council gets a new line
     await sleep(15000) // Wait for 15 seconds
     reloaded = false // Set reloaded to false (cooldown off)
   } else if (line.toLowerCase() === 'exit') { // If line equals exit
+    rpc.destroy()
     process.exit() // Exit the process
   } else if (line.toLowerCase() === 'refreshclient') {
     refreshclient()
