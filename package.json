@@ -1,21 +1,20 @@
 {
-  "name": "nrpc",
-  "version": "1.0.0",
-  "description": "A simple but powerful RPC tool for discord",
+  "name": "jsliam",
+  "version": "2.0.0",
+  "description": "A simple, leightweight, powerful, and customizable rich presence tool for Discord.",
   "main": "src/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node -r esm src/main.js"
   },
   "author": "VoidNulll",
   "license": "MIT",
   "dependencies": {
-    "@axonteam/eslint-config": "^2.1.1",
     "discord-rpc": "^3.0.2",
     "esm": "^3.2.25",
     "eventemitter3": "^4.0.0"
   },
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "jsdoc-to-markdown": "^5.0.0"
+    "@axonteam/eslint-config": "^2.1.1",
+    "eslint": "^5.16.0"
   }
 }
