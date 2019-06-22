@@ -44,7 +44,7 @@ ee.on('exit', () => {
     setTimeout(process.exit, 1000);
 } );
 
-const fivemin = 30000;
+const fivemin = 300000;
 
 setInterval(updateConfig, fivemin);
 
