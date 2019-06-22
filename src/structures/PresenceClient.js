@@ -174,7 +174,7 @@ class PresenceClient extends EventEmitter {
      */
     _onReady() {
         this.setPresence();
-        this.emit('Ready');
+        this.emit('ready');
         return;
     }
 }
