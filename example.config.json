@@ -1,8 +1,8 @@
 {
-  "clientId": "513462902053797903",
-  "timestamp": "false",
-  "quotes": [ "Posting random stuff", "Pong!" ],
-  "largeImageKey": "dynoglitch",
-  "largeImageText": "Dyno server icon",
-  "state": "Ping!"
+    "clientId": "Client ID here",
+    "timestamp": true,
+    "state": "I am Null",
+    "details": ["Easy rewrite", "Weee", "Fuck Circular objects"],
+    "largeImageKey": "null",
+    "largeImageText": "Whats this?"
 }
