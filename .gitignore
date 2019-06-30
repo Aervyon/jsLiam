@@ -11,3 +11,8 @@ node_modules/
 
 yarn.lock
 package-lock.json
+
+# Ignore tsconfig buildinfo
+
+tsconfig.tsbuildinfo
+**/tsconfig.tsbuildinfo
