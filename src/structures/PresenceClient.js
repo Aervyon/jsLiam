@@ -42,6 +42,7 @@ class PresenceClient extends EventEmitter {
      * Verifys/fixed any configuration mistakes.. I hope...
      *
      * @param {Object} newConf The optional new config to compare against.
+     * @returns {Object} Verified config
      */
     _verifyConf(newConf) {
         const arrays = this._arrays;
@@ -85,7 +86,8 @@ class PresenceClient extends EventEmitter {
     /**
      * Picks a random spot in an array.
      *
-     * @param {*} array Array to randomize
+     * @param {String|String[]} array Array to randomize
+     * @returns {String}
      */
     genRandom(array) {
         if (!Array.isArray(array) ) array = Array(array);
@@ -98,6 +100,7 @@ class PresenceClient extends EventEmitter {
      * Makes the config a *little* nicer...
      *
      * @param {Object} [newConf] New configuration for the app.
+     * @retusn {Promise<Object>} The new config;
      */
     _getConf(newConf) {
         const nConf = {};
@@ -128,6 +131,7 @@ class PresenceClient extends EventEmitter {
      * Sets/updates the presence. Also updates config.
      *
      * @param {Object} [newConf] New configuration
+     * @returns {Promise<object>} The activity
      */
     setPresence(newConf) {
         this.config = this._verifyConf();
@@ -158,12 +162,12 @@ class PresenceClient extends EventEmitter {
      * Function to start the presence
      *
      * @param {String} clientID Your apps client ID
+     * @returns void;
      */
     init(clientID) {
         this.cID = clientID;
         this.client.login( { clientId: this.cID } );
         this.client.once('ready', this._onReady.bind(this) );
-        return;
     }
 
     /**
@@ -171,11 +175,11 @@ class PresenceClient extends EventEmitter {
      * Private ready event for PresenceClient
      *
      * @memberof PresenceClient
+     * @returns void;
      */
     _onReady() {
         this.setPresence();
         this.emit('ready');
-        return;
     }
 }
 
