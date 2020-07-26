@@ -1,8 +1,6 @@
 {
     "clientId": "Client ID here",
     "timestamp": true,
-    "state": "I am Null",
-    "details": ["Easy rewrite", "Weee", "Fuck Circular objects"],
-    "largeImageKey": "null",
-    "largeImageText": "Whats this?"
+    "state": "I am Batman",
+    "details": ["Breal time!", "Circular objects are bad"]
 }
