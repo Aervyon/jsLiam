@@ -23,7 +23,7 @@ noUpdate       | `Boolean`             | No       | Whether or not to update the
 Type       | Link
 ---------- | ----
 JavaScript | [Click here](./example.config.js)
-JSON       | [Clic here](./example.config.json)
+JSON       | [Click here](./example.config.json)
 
 ## Setup
 
@@ -42,6 +42,10 @@ Discord     |
 - `git clone https://github.com/VoidNulll/jsLiam.js`
 - `npm install -g typescript` (Linux: `sudo npm install -g typescript`)
 - `npm run setup`
+
+### Running
+
+- `npm run`
 
 ## Copyright
 
