@@ -47,6 +47,11 @@ Discord     |
 
 - `npm run`
 
+### Updating
+
+- `git pull`
+- `npm run build`
+
 ## Copyright
 
 Copyright VoidNulll 2018-2020
