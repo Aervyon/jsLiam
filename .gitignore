@@ -9,10 +9,16 @@ node_modules/
 
 # Ignore lock files
 
-yarn.lock
 package-lock.json
 
-# Ignore tsconfig buildinfo
+# Ignore build related files
 
 tsconfig.tsbuildinfo
 **/tsconfig.tsbuildinfo
+build/
+*.d.ts
+**/*.d.ts
+**/**/*.d.ts
+*.js
+**/*.js
+**/**/*.js
