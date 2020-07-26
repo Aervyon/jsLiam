@@ -2,34 +2,18 @@
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
         "alwaysStrict": true,
-        "declaration": true,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        //"strict": true,
+        "declaration": false,
+        "strict": true,
         "incremental": true,
-        "lib": [
-            "esnext",
-            "esnext.array",
-            "esnext.asynciterable",
-            "esnext.intl",
-            "esnext.symbol"
-        ],
-            "module": "ESNext",
-            "moduleResolution": "node",
-            "noUnusedLocals": true,
-            //"outDir": "./typings",
-            "pretty": true,
-            "removeComments": true,
-            "resolveJsonModule": true,
-            "sourceMap": false,
-            "strictFunctionTypes": true,
-            "strictBindCallApply": true,
-            "target": "esnext",
-            "types": ["node"]
-        },
-        "exclude": [
-            "node_modules/",
-            "typings/"
-        ]
-        //"include": ["src"]
+        "moduleResolution": "node",
+        "noUnusedLocals": true,
+        "outDir": "./build",
+        "removeComments": false,
+        "resolveJsonModule": true,
+        "types": ["node"],
+        "module": "CommonJS",
+        "target": "ES2020",
+        "pretty": true
+    },
+    "include": ["src"],
 }

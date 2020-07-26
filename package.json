@@ -2,21 +2,20 @@
   "name": "jsliam",
   "version": "3.0.0",
   "description": "A simple, lightweight, powerful, and customizable rich presence tool for Discord.",
-  "main": "src/main.js",
+  "main": "build/main.js",
   "scripts": {
-    "start": "node -r esm src/main.js",
+    "start": "node build/main.js",
     "setup": "npm install && tsc"
   },
   "author": "VoidNulll",
   "license": "MIT",
   "dependencies": {
+    "@types/discord-rpc": "^3.0.4",
     "discord-rpc": "^3.0.2",
-    "esm": "^3.2.25",
-    "eventemitter3": "^4.0.0"
+    "@types/node": "^12.0.10"
   },
   "devDependencies": {
     "@axonteam/eslint-config": "^2.1.1",
-    "@types/node": "^12.0.10",
     "eslint": "^5.16.0",
     "typescript": "^3.5.2"
   }
