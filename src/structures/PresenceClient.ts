@@ -90,8 +90,11 @@ class PResenceClient extends EventEmitter {
             // @ts-ignore
             if (arrays.includes(key) ) {
                 // @ts-ignore
-                if (!Array.isArray(nConf[key] ) && typeof nConf[key] === 'string') conf[key] = Array(nConf[key] ); // @ts-ignore
-                else if (Array.isArray(nConf[key] ) && typeof nConf[key] === 'string') delete conf[key];
+                if (!Array.isArray(nConf[key] ) && typeof nConf[key] === 'string') { // @ts-ignore
+                    conf[key] = Array(nConf[key] ); // @ts-ignore
+                } else if (Array.isArray(nConf[key] ) && typeof nConf[key] === 'string') { // @ts-ignore
+                    delete conf[key];
+                }
             } else if (key === 'timestamp' && ![
                 true,
                 false,
@@ -100,8 +103,7 @@ class PResenceClient extends EventEmitter {
             ].includes(nConf[key] ) ) {
                 delete conf[key];
             } else if (key === 'partySize') { // @ts-ignore
-
-                if (isNaN(nConf[key] ) && isNaN(Number(nConf[key]) ) ) {
+                if (isNaN(nConf[key] ) && isNaN(Number(nConf[key] ) ) ) {
                     delete conf[key];
                     delete conf.partyMax;
                 } else if (!nConf.partyMax) {
@@ -146,10 +148,10 @@ class PResenceClient extends EventEmitter {
             largeImageText: 'large_text',
             smallImageText: 'small_text',
             smallImageKey: 'small_image',
-        }
+        };
 
         for (const key in conf) { // @ts-ignore
-            if (actMap[key]) {
+            if (actMap[key] ) {
                 // @ts-ignore
                 activity[key] = Array.isArray(conf[key] ) ? this.genRandom(conf[key] ) : conf[key]; // @ts-ignore
             } else if (Array.isArray(conf[key] ) ) { // @ts-ignore
@@ -171,7 +173,9 @@ class PResenceClient extends EventEmitter {
     }
 
     public genRandom(array: any[] | string): any {
-        if (!Array.isArray(array) ) array = Array(array);
+        if (!Array.isArray(array) ) {
+            array = Array(array);
+        }
         const item = array[Math.floor(Math.random() * array.length)];
 
         return item;

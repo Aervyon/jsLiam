@@ -1,0 +1,18 @@
+{
+    "extends": ["@axonteam", "plugin:@typescript-eslint/recommended"],
+    "rules": {
+        "consistent-return": "warn",
+        "new-cap": "warn",
+        "@typescript-eslint/no-explicit-any": "off",
+        "linebreak-style": "off",
+        "builtinGlobals": 0,
+        "no-shadow": "off",
+        "@typescript-eslint/ban-ts-comment": "off",
+        "camelcase": "off"
+    },
+    "env": {
+        "node": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"]
+}
