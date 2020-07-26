@@ -1,11 +1,11 @@
 {
   "name": "jsliam",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A simple, lightweight, powerful, and customizable rich presence tool for Discord.",
   "main": "src/main.js",
   "scripts": {
     "start": "node -r esm src/main.js",
-    "starttyped": "tsc -p ./ && node -r esm types/main.js"
+    "setup": "npm install && tsc"
   },
   "author": "VoidNulll",
   "license": "MIT",

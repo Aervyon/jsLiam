@@ -1,70 +1,48 @@
-# jsLiam 2.0
+# jsLiam
 
-jsLiam is a discord rich presence application that is very lightweight.
+jsLiam is a command line Discord RPC client made in TypeScript and built on NodeJS.
 
+## Config keys
 
-jsLiam 2.0 is handled by its own special client that works as a compatability layer between discord-rpc and the developer.
+Param          | Type(s)               | Required | Description
+-------------- | --------------------- | -------- | -----------
+clientID       | `String`              | Yes      | Client id of the discord app to connect to
+largeImageKey  | `Array` \| `String`   | No       | Presence large image key (The big image)
+largeImageText | `Array` \| `String`   | No       | Text that is shown when hovering over the large image
+smallImageKey  | `Array` \| `String`   | No       | Small image that is partially inside (bottom right) the large image
+smallImageText | `Array` \| `String`   | No       | Text shown when hovering over the small image
+details        | `Array` \| `String`   | No       | Text shown below application name
+state          | `Array` \| `String`   | No       | Text below details
+timestamp      | `Boolean` \| `String` | No       | If set to true, timestamp will be set when the app starts. "now" Resets the timestamp
+partySize      | `Number` (Max: 100)   | No       | Displays a number in parenthesis
+partyMax       | `Number` (Max: 100)   | No       | Maximum party size.
+noUpdate       | `Boolean`             | No       | Whether or not to update the config
 
-# Config keys
+## Example configs
 
-You can use either js or json for configs now. Yay!
+Type       | Link
+---------- | ----
+JavaScript | [Click here](./example.config.js)
+JSON       | [Clic here](./example.config.json)
 
-**If it is in <code>[]</code> it is optional**
-
-| Param | Type(s) | Description
-
-**[config.largeImageKey]** | <code>Array</code> | <code>String</code> | The presence largeImageKey
-
-**[config.largeImageText]** | <code>Array</code> | <code>String</code> | The presence largeImageText
-
-**[config.lsmallImageKey]** | <code>Array</code> | <code>String</code> | The presence smallImageKey
-
-**[config.smallImageText]** | <code>Array</code> | <code>String</code> | The presence smallImageText
-
-**[config.state]** | <code>Array</code> | <code>String</code> | The presences state.
-
-**[config.details]** | <code>Array</code> | <code>String</code> | The presence details
-
-**[config.timestamp]** | <code>Boolean</code> | <code>String</code> | <code>False</code> | Whether or not to have a timestamp. "now" will reset the timestamp.
-
-**[config.partySize]** | <code>Number</code> | The party size. Max: 1000.
-
-**[config.partyMax]** | <code>Number</code> | The maximum party size. Max: 100
-
-**[config.noUpdate]** <code>Boolean</code> | Whether or not to update the config.
-
-**config.clientId** | <code>String</code> | The client ID for the app you will be using with the presence.
-
-# How strict is jsLiam?
-
-This new version is fairly strict compared to the old one. You can take a look at most of the code in the [PresenceClient file](./src/structures/PresenceClient.js).
-
-# Example configs
-
-You can view a JS and a JSON example config under [JSON](./example.config.json) or [JavaScript](./example.config.js)
-
-# Setup
+## Setup
 
 ### Requiremennts
 
-- Nodejs (8+)
-- NPM/YARN
-- Discord
-- Internet access
+Requirement | Version?
+----------- | --------
+NodeJS      | 8.0 or later (12.18.3 is recommended)
+NPM         |
+TypeScript  | Latest, recommended
+Git         |
+Discord     |
 
 ### Installing
 
 - `git clone https://github.com/VoidNulll/jsLiam.js`
-- `yarn install` **or** `npm install`
+- `npm install -g typescript` (Linux: `sudo npm install -g typescript`)
+- `npm run setup`
 
-### Setting up
+## Copyright
 
-If you reference the configuration keys above and the example files you should be along rather far.`
-
-# Notes
-
-jsLiam NO LONGER comes pre setup. You have to build your own app. Kthx bai. Might change my mind on this.
-
-# Copyright
-
-Copyright VoidNulll 2018-2019
+Copyright VoidNulll 2018-2020
