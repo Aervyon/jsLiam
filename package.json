@@ -5,7 +5,8 @@
   "main": "build/main.js",
   "scripts": {
     "start": "node build/main.js",
-    "setup": "npm install && tsc"
+    "setup": "npm install && tsc",
+    "build": "tsc"
   },
   "author": "VoidNulll",
   "license": "MIT",
